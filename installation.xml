@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<productDefines  xmlns="http://www.suse.com/1.0/yast2ns"
+    xmlns:config="http://www.suse.com/1.0/configns">
+<textdomain>control-Mobilink</textdomain>
+<proposals config:type="list">
+
+  <proposal>
+        <label>Micro Focus GroupWise Mobility Service</label>
+        <name>mobilink</name>
+        <stage>continue,normal</stage>
+        <mode>installation,update,autoinstallation</mode>
+        <proposal_modules config:type="list">
+            <name>datasync</name>
+            <presentation_order>10</presentation_order>
+        </proposal_modules>
+  </proposal>
+
+</proposals>
+
+<workflows config:type="list">
+    	<workflow>
+		<label>Preparation</label>
+		<defaults>
+			<archs>x86_64</archs>
+		</defaults>
+		<stage>normal</stage>
+		<mode>installation</mode>
+                <modules config:type="list">
+			<module>
+				<label>Micro Focus GroupWise Mobility Service</label>
+				<name>inst_add-on_software</name>
+			        <arguments>
+                                        <sw_mode>patterns</sw_mode>
+                                </arguments>
+				<enable_back>no</enable_back>
+				<enable_next>yes</enable_next>
+			</module>
+			<module>
+			       <label>Micro Focus GroupWise Mobility Service</label>
+			       <name>inst_proposal</name>
+			       <enabled config:type="boolean">true</enabled>
+			       <proposal>mobilink</proposal>
+		       </module>
+                </modules>
+        </workflow>
+</workflows>
+</productDefines>
+

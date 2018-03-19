@@ -1,0 +1,45 @@
+###This is a sample file used to pass in with the install script to perform a head-less install  i.e. ./install.sh /path/install.in ###
+#the provisioning type: ldap or groupwise
+provision=ldap
+#the LDAP server IP address or hostname (if provisioning is set to groupwise, all ldap settings will be ignored)
+ldaphost=myldap.novell.com
+#the port of the LDAP server
+ldapport=636
+#specify if the LDAP is configured to use secure communication
+ldapsecure=yes
+#the LDAP admin DN that will be used as the GMS admin
+ldapadmin=cn=gmsadmin,o=novell
+#the password of the GMS admin user
+ldappass=ldappassword
+#the LDAP container that will be used for provisioning users
+ldapuser=ou=users,o=novell
+#the LDAP container that will be used for provisioning groups
+ldapgroup=ou=groups,o=novell
+#the GMS database password
+dbpass=dbpassword
+#the GroupWise user account that will be used to sync the GAL
+galuser=gwuser1
+#the port that devices will use when connecting to GMS
+devport=443
+#specifies if the GMS server is using SSL for device communication
+devsecure=true
+#specifies if the GMS server is using a self-signed certificate
+devcertselfsigned=true
+#specifies the path and name of the SSL certificate to use. If using a GMS-generated certificate, then set this value to "''"
+devcertpath="''"
+#specifies the value of the local host address to be used in the GroupWise Sync Agent configuration
+localip=""
+#specifies the path and name of the file that holds the GroupWise trusted app key
+gwappkeypath=/tmp/gwtrustedkey
+#specifies the GroupWise trusted app name
+gwappname=gwmobility
+#specifies GroupWise Post Office Agent IP address or hostname
+gwhost=mygw.novell.com
+#specifies the SOAP port
+gwport=7191
+#specifies if the GroupWise server is configured for secure SOAP
+gwsecure=yes
+#specifies the email address to use when registering with the Micro Focus Customer Center
+ccrEmail=""
+#specifies the activation code to use when registering with the Micro Focus Customer Center
+ccrCode=""
