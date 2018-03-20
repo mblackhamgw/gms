@@ -1,4 +1,3 @@
-
 import os, sys, logging, socket
 from subprocess import Popen, PIPE
 from time import sleep
@@ -12,11 +11,13 @@ class GMSINSTALL:
 
     def __init__(self):
         self.scriptDir = os.getcwd()
-        print 'Runding install.py from %s' %self.scriptDir
+        print 'Running install.py from %s' %self.scriptDir
+
+    def systemLocked(self):
+        pass
 
     def whoami(self):
         user = self.getuser()
-        self.logit('Welcome to the Micro Focus GroupWise Mobility Service install.')
         self.logit('You are logged in as root')
         login = self.getuser()
         if login != 0:
@@ -70,7 +71,7 @@ class GMSINSTALL:
 #        imageMagick = 'Magick'
 
         newinstall = "yes"
-        cmd = 'rpm -qa'
+        cmd = 'rpm -qa | grep datasync'
         p = Popen(cmd , shell=True, stdout=PIPE, stdin=PIPE, stderr=PIPE)
         for line in p.stdout:
             if 'datasync' in line:
@@ -145,22 +146,28 @@ class GMSINSTALL:
     def installpostgres(self):
         self.logit('\nInstalling Postgres Server')
         if self.slesUpgrade == 'yes':
-            p = Popen(['rpm', '-qa', ' | ' , 'grep' , 'datasync'], stdout=PIPE)
-
-            for line in p.stdout:
-                print line
-
+            pass
         else:
 
             cmd = ['zypper -n  in postgresql-server']
-            self.popen(cmd)
+            p = self.popen(cmd)
+
+            for line in p:
+                print line
+                while 'System management' in line:
+                    sleep(3)
+                    p = self.popen(cmd)
 
     def installImageMagick(self):
-        self.logit("Installing ImageMagick...")
-        p = Popen('zypper -n in ImageMagick', shell=True, stdout=PIPE)
-        for line in p.stdout:
+        self.logit("Installing ImageMagick..")
+        cmd = 'zypper -n in ImageMagick'
+        p = self.popen(cmd)
+        for line in p:
             print line
-
+            for line in p:
+                while 'System management' in line:
+                    sleep(3)
+                    p = self.popen(cmd)
 
     def checkImageMagick(self, imStatus):
         self.logit('Checking ImageMagick installation.')
@@ -218,75 +225,100 @@ class GMSINSTALL:
         else:
             return fqdn
 
-    def installRpmsFromdisk(self):
-        rpms = self.rpmlist()
+    def installUnixODBC(self):
         self.logit('Installing unixODBC')
-        cmd = 'zypper -n in unixODBC libodbc.so'
-        odbc = self.popen(cmd)
-        for line in odbc:
-            print 'odbc install: %s' % line
+        cmd = 'zypper -n in unixODBC'
+        unix_odbc = self.popen(cmd)
+        for line in unix_odbc:
+            while 'System management' in line:
+                sleep(3)
+                unix_odbc = self.popen(cmd)
 
-        #cmd = 'zypper -n in libodbc.so'
 
-
+    def installLdap(self):
         python_ldap = 'python-pyldap'
         cmd = 'zypper -n se %s' % python_ldap
         zyppersearch = self.popen(cmd)
         for line in zyppersearch:
-
-            if 'No matching items' in line:
+            # print line
+            if 'No matching items' not in line:
                 print line
-                python_ldap = 'python-ldap'
-            elif 'python-pyldap' in line and 'package ' in line:
-
-
                 cmd = 'zypper -n in %s' % python_ldap
                 pythonldapinstall = self.popen(cmd)
                 for line in pythonldapinstall:
                     print line
 
+                    for line in pythonldapinstall:
+                        while 'System management' in line:
+                            sleep(3)
+                            unix_odbc = self.popen(cmd)
 
-        self.logit('Installing required rpms')
-        zypperlist = ['python-openssl',
-                   'python-M2Crypto',
-                   'python-lxml']
 
-        rpmlist = ['python-pyodbc',
-                   'librtfcomp0',
-                   'psqlODBC',
-                   'pycopg2',
-                   'python-rtf',
-                ]
-        for package in zypperlist:
-            cmd = 'zypper -n in %s' % package
-            zypperin = self.popen(cmd)
-            for line in zypperin:
-                print line
 
-        for diskrpm in rpmlist:
-            print diskrpm
+                            #        for rpm in rpms:
+        #            if 'python-ldap' in rpm:
+        #                if 'pyasn1' in rpm:
+        #                    print rpm
+        #                    cmd = 'rpm -Uvh %s' % rpm
+        #                    for line in pyasn1:
+        #                        print line
 
-            for rpmname in rpms:
-                #print rpmname
+        #               cmd = 'rpm -Uvh %s' % rpm
+        #                pyldap_install = self.popen(cmd)
+        #                for line in pyldap_install:
+        #                    print line
 
-                if diskrpm in rpmname:
-                    if diskrpm == ' librtfcomp0':
-                        cmd = 'rpm -i --force %s' % rpmname
-                        print 'librt command %s' % cmd
-                    else:
-                        cmd = 'rpm -i %s' % rpmname
+    def installRpmsFromdisk(self):
 
-                    rpmin = self.popen(cmd)
-                    for line in rpmin:
+
+        rpms = self.rpmlist()
+        #for package in rpms:
+        #    print package
+
+        self.logit("Installing python-openssl...")
+        cmd = 'zypper -n in python-pyOpenSSL'
+        p = self.popen(cmd)
+        for line in p:
+            print line
+
+        self.logit("Installing python-M2Crypto...")
+        cmd = 'zypper -n in python-M2Crypto'
+        p = self.popen(cmd)
+        for line in p:
+            print line
+
+        self.logit("Installing python-lxml...")
+        cmd = 'zypper -n in python-lxml'
+        p = self.popen(cmd)
+        for line in p:
+            print line
+
+        toInstall = ['librtfcomp0', 'psqlODBC', 'python-pyodbc', 'python-psycopg', 'python-rtfcomp']
+        for rpm in rpms:
+
+            for pkg in toInstall:
+
+                if pkg in rpm:
+                    self.logit("Installing %s..." % pkg)
+                    cmd = 'rpm -Uvh %s' % rpm
+                    p = self.popen(cmd)
+                    for line in p:
                         print line
 
-    def installPsql(self):
-        cmd = 'zypper -n in postgresql-server'
-        psql = self.popen(cmd)
-        return psql
 
 
+        self.logit( "Installing GMS rpms...")
+        dsList = glob("%s/suse/x86_64/datasync-*" % self.scriptDir)
+        #print dsList
+        rpmswitch = '--replacefiles --force'
+        dsString = ' '.join(dsList)
 
+        cmd = 'rpm -Uvh %s %s' % (rpmswitch, dsString)
+        #print cmd
+        p = self.popen(cmd)
+        for line in p:
+            print line
+    #
 
 
 
